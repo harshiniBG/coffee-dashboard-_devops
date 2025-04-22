@@ -1,0 +1,1 @@
+# Initialize the coffee dashboard package
