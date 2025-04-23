@@ -19,5 +19,14 @@ services:
     volumes:
       - mongodb_data:/data/db
 
+  test:
+    build: .
+    command: python -m pytest tests/
+    environment:
+      - MONGODB_URI=mongodb://mongodb:27017/
+    depends_on:
+      - mongodb
+      - web
+
 volumes:
   mongodb_data:

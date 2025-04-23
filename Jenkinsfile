@@ -5,6 +5,10 @@ pipeline {
         DOCKER_IMAGE = 'coffee-dashboard'
     }
 
+    triggers {
+        pollSCM('H/5 * * * *') // Check for changes every 5 minutes
+    }
+
     stages {
         stage('Checkout') {
             steps {
@@ -12,10 +16,15 @@ pipeline {
             }
         }
 
-        stage('Build') {
+        stage('Build & Test') {
             steps {
                 sh 'pip install -r requirements.txt'
-                sh 'python -m pytest tests/'
+                sh 'python -m pytest tests/ --junitxml=test-results.xml'
+            }
+            post {
+                always {
+                    junit 'test-results.xml'
+                }
             }
         }
 
@@ -40,8 +49,15 @@ pipeline {
     }
 
     post {
-        always {
-            cleanWs()
+        failure {
+            emailext body: 'Build failed: ${BUILD_URL}',
+                    subject: 'FAILED: ${JOB_NAME} - Build #${BUILD_NUMBER}',
+                    to: 'dev-team@example.com'
+        }
+        success {
+            emailext body: 'Build succeeded: ${BUILD_URL}',
+                    subject: 'SUCCESS: ${JOB_NAME} - Build #${BUILD_NUMBER}',
+                    to: 'dev-team@example.com'
         }
     }
 }
