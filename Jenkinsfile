@@ -2,7 +2,7 @@ pipeline {
     agent any
 
     environment {
-        DOCKER_IMAGE = 'coffee-dashboard-hi'
+        DOCKER_IMAGE = 'coffee-dashboard'
     }
 
     triggers {
